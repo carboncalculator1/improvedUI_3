@@ -1,0 +1,135 @@
+<!-- login.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Carbon Calculator Yanga</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="auth-container">
+        <div class="auth-card">
+            
+            <h1>Carbon Calculator Yanga</h1>
+            
+            <div class="auth-tabs">
+                <button class="auth-tab active" id="loginTab">Login</button>
+                <button class="auth-tab" id="signupTab">Sign Up</button>
+            </div>
+            
+            <!-- Login Form -->
+            <form id="loginForm" class="auth-form active">
+                <div class="input-group">
+                    <label for="loginIdentifier"><i class="fas fa-user"></i> Email</label>
+                    <div class="password-container"> 
+                        <input type="text" id="loginIdentifier" required> 
+                    </div>
+                    
+                </div>
+                
+                <div class="input-group">
+                    <label for="loginPassword"><i class="fas fa-lock"></i> Password</label>
+                    <div class="password-container">
+                        <input type="password" id="loginPassword" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('loginPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="auth-btn">Login</button>
+                <p id="loginError" class="error-message"></p>
+            </form>
+            
+            <!-- Sign Up Form -->
+            <form id="signupForm" class="auth-form">
+                <div class="input-group">
+                    <label for="signupUsername"><i class="fas fa-user"></i> Username</label>
+                    <div class="password-container"> 
+                        <input type="text" id="signupUsername" required> 
+                    </div>
+                </div>
+            <!-- Province Selection -->
+            <div class="input-group">
+                <label for="signupProvince"><i class="fas fa-map-marker-alt"></i> Province</label>
+                <select id="signupProvince" required>
+                    <option value="">Select your province</option>
+                    <option value="Lusaka">Lusaka</option>
+                    <option value="Copperbelt">Copperbelt</option>
+                    <option value="Central">Central</option>
+                    <option value="Eastern">Eastern</option>
+                    <option value="Luapula">Luapula</option>
+                    <option value="Northern">Northern</option>
+                    <option value="North-Western">North-Western</option>
+                    <option value="Southern">Southern</option>
+                    <option value="Western">Western</option>
+                    <option value="Muchinga">Muchinga</option>
+                </select>
+            </div>
+                
+                <div class="input-group">
+                    <label for="signupEmail"><i class="fas fa-envelope"></i> Email</label>
+                    <div class="password-container"> 
+                        <input type="email" id="signupEmail" required>
+                    </div>
+                    
+                </div>
+                
+                <div class="input-group">
+                    <label for="signupPassword"><i class="fas fa-lock"></i> Password</label>
+                    <div class="password-container">
+                        <input type="password" id="signupPassword" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('signupPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="input-group">
+                    <label for="confirmPassword"><i class="fas fa-lock"></i> Confirm Password</label>
+                    <div class="password-container">
+                        <input type="password" id="confirmPassword" required>
+                        <button type="button" class="toggle-password" onclick="togglePassword('confirmPassword')">
+                            <i class="fas fa-eye"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <button type="submit" class="auth-btn">Sign Up</button>
+                <p id="signupError" class="error-message"></p>
+            </form>
+            
+            <p class="auth-redirect">Continue without account? <a href="index.html">Use Calculator</a></p>
+
+            <p class="footer-text"><a href="terms.html"><u>Terms of Use</u></a></p>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+                apiKey: "AIzaSyCCNhqRfWuHoRmaBUsGNYY_kDjygsIkUMQ",
+                authDomain: "climateyanga.firebaseapp.com",
+                projectId: "climateyanga",
+                storageBucket: "climateyanga.firebasestorage.app",
+                messagingSenderId: "1061123944259",
+                appId: "1:1061123944259:web:d20f0d45c7ff925185c9f6"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+    </script>
+    
+    <script src="auth.js"></script>
+</body>
+</html>

@@ -1,0 +1,139 @@
+<!-- admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Carbon Calculator Yanga</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="admin-container">
+        <header class="admin-header">
+            <h1><i class="fas fa-leaf"></i> Admin Panel</h1>
+            <div class="admin-menu">
+                    <select id="locationFilter" class="admin-btn">
+                    <option value="all">All Provinces</option>
+                    <option value="Lusaka">Lusaka</option>
+                    <option value="Copperbelt">Copperbelt</option>
+                    <option value="Central">Central</option>
+                    <option value="Eastern">Eastern</option>
+                    <option value="Luapula">Luapula</option>
+                    <option value="Northern">Northern</option>
+                    <option value="North-Western">North-Western</option>
+                    <option value="Southern">Southern</option>
+                    <option value="Western">Western</option>
+                    <option value="Muchinga">Muchinga</option>
+                    </select>
+                <button id="refreshBtn" class="admin-btn"><i class="fas fa-sync"></i> Refresh</button>
+                <button id="logoutBtn" class="admin-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </header>
+        
+        <div class="admin-content">
+            <div class="stats-cards">
+                <div class="stat-card">
+                    <h3>Total Users</h3>
+                    <span id="totalUsers">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Calculations</h3>
+                    <span id="totalCalculations">0</span>
+                </div>
+                <div class="stat-card">
+                    <h3>Average Emissions</h3>
+                    <span id="avgEmissions">0</span>
+                </div>
+            </div>
+            
+            <div class="users-table">
+                <h2>Users</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Username</th>
+                            <th>Email</th>
+                            <th>Province</th> 
+                            <th>Signup Date</th>
+                            <th>Calculations</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTableBody">
+                        <!-- Users will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+
+<div class="appointments-table">
+  <h2>Appointment Requests</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Province</th>
+        <th>Date</th>
+        <th>Status</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody id="appointmentsTableBody">
+      <!-- Appointments will be loaded here -->
+    </tbody>
+  </table>
+</div>
+
+<!-- Appointment Details Modal -->
+<div id="appointmentDetailsModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Appointment Details</h2>
+    <div id="appointmentDetailsContent">
+      <!-- Details will be loaded here -->
+    </div>
+  </div>
+</div>
+            
+            <!-- NEW: User Details Section -->
+    <div class="user-details" id="userDetails">
+        <h2>User Details</h2>
+        <div id="userDetailsContent">Select a user to view details.</div>
+    </div>
+
+    <!-- NEW: Calculation Details Section -->
+    <div class="calculation-details" id="calculationDetails">
+        <h2>Calculation Details</h2>
+        <div id="calculationDetailsContent">Select a calculation to view details.</div>
+    </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase configuration (same as before)
+        const firebaseConfig = {
+                apiKey: "AIzaSyCCNhqRfWuHoRmaBUsGNYY_kDjygsIkUMQ",
+                authDomain: "climateyanga.firebaseapp.com",
+                projectId: "climateyanga",
+                storageBucket: "climateyanga.firebasestorage.app",
+                messagingSenderId: "1061123944259",
+                appId: "1:1061123944259:web:d20f0d45c7ff925185c9f6"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+    </script>
+    
+    <script src="admin.js"></script>
+</body>
+</html>

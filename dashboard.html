@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Carbon Calculator Yanga</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "rknx7hxfio");
+    </script>
+    
+</head>
+<body>
+<div class="main-container">
+    <div class="container">
+
+        
+    <div class="dashboard-container">
+        <header class="dashboard-header">
+            <h1><i class="fas fa-leaf"></i> Carbon Calculator Yanga</h1>
+            <div class="user-menu">
+                <span id="userWelcome">Welcome, User!</span>
+                <!-- Admin link will be inserted here if user is admin -->
+                <button id="logoutBtn" class="logout-btn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+        </header>
+        
+        <div class="dashboard-content">
+            <div class="stats-card">
+                <h2>Your Carbon Footprint Summary</h2>
+                <div class="total-emissions">
+                    <span id="totalEmissionsValue">0</span>
+                    <span>kg CO₂e Total</span>
+                </div>
+                <p>Based on your calculation history</p>
+            </div>
+            
+            <div class="actions-card">
+                <h2>Quick Actions</h2>
+                <a href="index.html" class="action-btn">
+                    <i class="fas fa-calculator"></i>
+                    <span>New Calculation</span>
+                </a>
+                <button id="viewHistoryBtn" class="action-btn">
+                    <i class="fas fa-history"></i>
+                    <span>View History</span>
+                </button>
+            </div>
+            
+            <div class="history-card" id="historySection" style="display: none;">
+                <h2>Calculation History</h2>
+                <div id="calculationsList" class="calculations-list">
+                    <!-- Calculation history will be loaded here -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCCNhqRfWuHoRmaBUsGNYY_kDjygsIkUMQ",
+            authDomain: "climateyanga.firebaseapp.com",
+            projectId: "climateyanga",
+            storageBucket: "climateyanga.firebasestorage.app",
+            messagingSenderId: "1061123944259",
+            appId: "1:1061123944259:web:d20f0d45c7ff925185c9f6"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        
+        // Dashboard functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check if user is logged in
+            auth.onAuthStateChanged(async (user) => {
+                if (!user) {
+                    // Redirect to login if not authenticated
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                // Display user info
+                const userDoc = await db.collection('users').doc(user.uid).get();
+                const userData = userDoc.data();
+                document.getElementById('userWelcome').textContent = `Welcome, ${userData.username || user.email}!`;
+                
+                // Add admin link if user is admin
+                if (userData.isAdmin) {
+                    const adminLink = document.createElement('a');
+                    adminLink.href = 'admin.html';
+                    adminLink.textContent = 'Admin Panel';
+                    adminLink.className = 'admin-link';
+                    adminLink.innerHTML = '<i class="fas fa-cog"></i> Admin Panel';
+                    
+                    // Insert before logout button
+                    const logoutBtn = document.getElementById('logoutBtn');
+                    logoutBtn.parentNode.insertBefore(adminLink, logoutBtn);
+                }
+                
+                // Load calculation history from subcollection
+                await loadCalculationHistory(user.uid, userData);
+                
+                // Set up logout button
+                document.getElementById('logoutBtn').addEventListener('click', () => {
+                    auth.signOut().then(() => {
+                        window.location.href = 'login.html';
+                    });
+                });
+                
+                // Toggle history view
+                document.getElementById('viewHistoryBtn').addEventListener('click', () => {
+                    const historySection = document.getElementById('historySection');
+                    if (historySection.style.display === 'none') {
+                        historySection.style.display = 'block';
+                    } else {
+                        historySection.style.display = 'none';
+                    }
+                });
+            });
+        });
+
+        async function loadCalculationHistory(userId, userData) {
+            const calculationsList = document.getElementById('calculationsList');
+            const totalEmissionsValue = document.getElementById('totalEmissionsValue');
+            
+            try {
+                // Get calculations from the subcollection
+                const snapshot = await db.collection('users').doc(userId)
+                    .collection('calculations')
+                    .orderBy('timestamp', 'desc')
+                    .get();
+                
+                if (snapshot.empty) {
+                    calculationsList.innerHTML = '<p class="no-data">No calculations yet. Start by creating a new calculation!</p>';
+                    totalEmissionsValue.textContent = '0';
+                    return;
+                }
+                
+                // Calculate total emissions and prepare calculations array
+                let totalEmissions = 0;
+                const calculations = [];
+                
+                snapshot.forEach(doc => {
+                    const calc = { id: doc.id, ...doc.data() };
+                    calculations.push(calc);
+                    totalEmissions += calc.results.total || 0;
+                });
+                
+                totalEmissionsValue.textContent = totalEmissions.toFixed(1);
+                
+                // Display calculation history
+                calculationsList.innerHTML = '';
+                calculations.forEach((calc, index) => {
+                    const calcElement = document.createElement('div');
+                    calcElement.className = 'calculation-item';
+                    
+                    // Format timestamp
+                    let timestampText = 'Date not available';
+                    if (calc.timestamp && calc.timestamp.toDate) {
+                        timestampText = new Date(calc.timestamp.toDate()).toLocaleDateString();
+                    } else if (calc.timestamp) {
+                        timestampText = new Date(calc.timestamp).toLocaleDateString();
+                    }
+                    
+                    calcElement.innerHTML = `
+                        <div class="calc-header">
+                            <h3>${calc.type.charAt(0).toUpperCase() + calc.type.slice(1)} Calculation</h3>
+                            <span class="calc-date">${timestampText}</span>
+                        </div>
+                        <div class="calc-summary">
+                            <p>Total: <strong>${calc.results.total.toFixed(1)} kg CO₂e</strong></p>
+                            <button class="view-details-btn" data-index="${index}">View Details</button>
+                        </div>
+                        <div class="calc-details" id="details-${index}" style="display: none;">
+                            <h4>Inputs:</h4>
+                            <pre>${JSON.stringify(calc.inputs, null, 2)}</pre>
+                            <h4>Results:</h4>
+                            <pre>${JSON.stringify(calc.results, null, 2)}</pre>
+                        </div>
+                    `;
+                    calculationsList.appendChild(calcElement);
+                });
+                
+                // Add event listeners to view details buttons
+                document.querySelectorAll('.view-details-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const index = btn.getAttribute('data-index');
+                        const detailsElement = document.getElementById(`details-${index}`);
+                        if (detailsElement.style.display === 'none') {
+                            detailsElement.style.display = 'block';
+                            btn.textContent = 'Hide Details';
+                        } else {
+                            detailsElement.style.display = 'none';
+                            btn.textContent = 'View Details';
+                        }
+                    });
+                });
+                
+            } catch (error) {
+                console.error('Error loading calculation history:', error);
+                calculationsList.innerHTML = '<p class="no-data">Error loading calculations. Please try again.</p>';
+                totalEmissionsValue.textContent = '0';
+            }
+        }
+    </script>
+
+</div>
+    <!-- Sidebar for Offset Options -->
+    <div class="sidebar">
+        <h2><i class="fas fa-seedling"></i> Offset Your Carbon Footprint</h2>
+        <div class="offset-option">
+            <h3><i class="fas fa-tree"></i> Plant Trees</h3>
+            <p>Support local reforestation projects. One tree offsets approximately 25kg of CO2 annually.</p>
+            <a href="https://www.facebook.com/share/p/16fVrQh3vP/" class="offset-btn">Plant Now</a>
+        </div>
+        <div class="offset-option">
+            <h3><i class="fas fa-recycle"></i> Eco Waste Management</h3>
+            <p>Fund innovative recycling programs and waste reduction initiatives.</p>
+            <a href="https://www.facebook.com/share/p/19ZKjJYUWH/" class="offset-btn">Support</a>
+        </div>
+        <div class="offset-option">
+            <h3><i class="fas fa-building"></i> Green Building Projects</h3>
+            <p>Support sustainable building practices and renewable energy infrastructure.</p>
+            <a href="https://www.facebook.com/share/v/16ZgiYnazm/" class="offset-btn">Support</a>
+        </div>
+
+    </div>
+</div>
+</div>
+
+    <!-- Partners Section -->
+<div class="partners-section">
+    <h2>Our Partners</h2>
+    <div class="partners-scroll">
+        <div class="partners-scroll-inner">
+            <div class="partner">
+                <img src="/images/Kmobile.png" alt="KMobile Hub">
+                <p>KMobile Hub</p>
+            </div>
+            <div class="partner">
+                <img src="/images/bwana.jpeg" alt="KMobile Hub">
+                <p>Bwana Lifestyle</p>
+            </div>
+	    <div class="partner">
+                <img src="/images/musika.jpeg" alt="KMobile Hub">
+                <p>Musika</p>
+            </div>
+
+            <!-- Duplicate partners to create infinite scroll effect -->
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Add this right before the closing </body> tag -->
+<!-- Add this before the closing </body> tag -->
+<footer class="site-footer">
+  <div class="footer-content">
+    <div class="social-buttons" aria-hidden="false">
+      <a href="https://www.facebook.com/share/p/1EhnQWLuTE/" target="_blank" class="facebook-btn" aria-label="Follow us on Facebook">
+        <i class="fab fa-facebook-f" aria-hidden="true"></i>
+        <span>Follow Us</span>
+      </a>
+
+      <a href="mailto:info@climateyanga.com" class="gmail-btn" aria-label="Contact us by email">
+        <i class="fas fa-envelope" aria-hidden="true"></i>
+        <span>Contact Us</span>
+      </a>
+    </div>
+	  
+    <p class="footer-text">A climate awareness and action initiative by: <strong>Carbon Calculator Yanga Foundation, © 2025</strong></p>
+	 <p class="footer-text"><a href="terms.html"><u>Terms of Use</u></a></p>
+  </div>
+</footer>
+
+<script src="app.js" ></script>
+</body>
+</html>
