@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carbon Calculator Yanga</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+	 <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.1.0/firebase-firestore-compat.js"></script>
+    
+    
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "rknx7hxfio");
+    </script>
+
+</head>
+<body>
+<div class="main-container">
+    <div class="container">
+        <h1>
+            <i class="fas fa-leaf"></i>
+            Carbon Calculator Yanga
+        </h1>
+	 <div class="user-auth">
+        <span id="userStatus">Not logged in</span>
+            		<button onclick="window.location.href='login.html'" class="auth-button" id="authButton">
+        		<i class="fas fa-arrow-left"></i>Login/signup</button>
+
+        </div>
+
+        <div class="nav-tabs">
+            <button class="nav-btn active" onclick="showSection('personal')">
+                <i class="fas fa-user"></i>
+                Personal
+            </button>
+            <button class="nav-btn" onclick="showSection('construction')">
+                <i class="fas fa-building"></i>
+                Construction
+            </button>
+            <button class="nav-btn" onclick="showSection('manufacturing')">
+                <i class="fas fa-industry"></i>
+                Manufacturing
+            </button>
+			    <button class="nav-btn" onclick="showSection('agriculture')">
+        <i class="fas fa-tractor"></i>
+        		Agriculture
+    </button>
+			<button class="nav-btn" onclick="showSection('openair')">
+    			<i class="fas fa-fire"></i>
+    			Open-Air Burning
+			</button>
+				<button class="nav-btn" onclick="showSection('student')">
+    <i class="fas fa-graduation-cap"></i>
+    		Student
+			</button>
+        </div>
+
+
+        <div id="personal" class="section active">
+						<!-- Transport control -->
+			<div class="input-group">
+    			<label>
+        			<i class="fas fa-car icon"></i>
+        			Transportation Type
+        			<span class="tooltip">
+            		<i class="fas fa-info-circle"></i>
+            			<span class="tooltiptext">Select the type of transportation you typically use</span>
+       				 </span>
+    			</label>
+   			 <select id="commuteType" class="meal-type-select">
+        			<option value="walking" data-icon="🚶‍➡️">🚶‍➡️Walk</option>
+				<option value="bicycle" data-icon="🚴‍♂️">🚴‍♂️Bicycle</option>
+				<option value="motorbike" data-icon="🏍️">🏍️Motorbike</option>
+				<option value="carSmall" data-icon="🚗">🚗Small vehicle</option>
+				<option value="carMedium" data-icon="🚙">🚙Medium vehicle</option>
+        			<option value="carLarge" data-icon="🚌">🚌 Large vehicle</option>
+        			<option value="carElectric" data-icon="⚡🚗">⚡🚗Electric Vehicle</option>
+    		</select>
+			</div>
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-car icon"></i>
+                    Daily Commute Distance (km)
+                    <span class="tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Your daily round-trip distance for work/school commute</span>
+                    </span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" class="slider" min="0" max="200" value="20" step="1" oninput="updateSliderValue(this, 'commuteValue')">
+                    <span class="slider-value" id="commuteValue">20</span>
+                </div>
+            </div>
+		<!-- Enhanced Waste Input Section -->
+			<div class="input-group">
+    			<label>
+        			<i class="fas fa-trash icon"></i>
+        				Waste Generated per Week
+        			<span class="tooltip">
+           			 <i class="fas fa-info-circle"></i>
+            			<span class="tooltiptext">Enter your weekly waste generation by type</span>
+       			 </span>
+   		 </label>
+    
+    <div class="waste-input-container">
+        <!-- Food Waste -->
+        <div class="waste-type-input">
+            <label>
+                <i class="fas fa-apple-alt icon"></i>
+                Food Waste (kg)
+            </label>
+            <div class="slider-container">
+                <input type="range" class="slider" min="0" max="20" value="0" step="0.1" oninput="updateSliderValue(this, 'foodWasteValue')">
+                <span class="slider-value" id="foodWasteValue">0</span>
+            </div>
+        </div>
+        
+        <!-- Paper Waste -->
+        <div class="waste-type-input">
+            <label>
+                <i class="fas fa-file-alt icon"></i>
+                Paper Waste (kg)
+            </label>
+            <div class="slider-container">
+                <input type="range" class="slider" min="0" max="20" value="0" step="0.1" oninput="updateSliderValue(this, 'paperWasteValue')">
+                <span class="slider-value" id="paperWasteValue">0</span>
+            </div>
+        </div>
+        
+        <!-- Plastic Waste -->
+        <div class="waste-type-input">
+            <label>
+                <i class="fas fa-wine-bottle icon"></i>
+                Plastic Waste (kg)
+            </label>
+            <div class="slider-container">
+                <input type="range" class="slider" min="0" max="20" value="0" step="0.1" oninput="updateSliderValue(this, 'plasticWasteValue')">
+                <span class="slider-value" id="plasticWasteValue">0</span>
+            </div>
+        </div>
+        
+        <!-- Metal Waste -->
+        <div class="waste-type-input">
+            <label>
+                <i class="fas fa-wrench icon"></i>
+                Metal Waste (kg)
+            </label>
+            <div class="slider-container">
+                <input type="range" class="slider" min="0" max="20" value="0" step="0.1" oninput="updateSliderValue(this, 'metalWasteValue')">
+                <span class="slider-value" id="metalWasteValue">0</span>
+            </div>
+        </div>
+    </div>
+</div>
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-bolt icon"></i>
+                    Monthly Electricity Consumption (kWh)
+                    <span class="tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Check your electricity bill for this information</span>
+                    </span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" class="slider" min="0" max="1000" value="300" step="10" oninput="updateSliderValue(this, 'electricityValue')">
+                    <span class="slider-value" id="electricityValue">300</span>
+                </div>
+            </div>
+			<!-- NEW: Electricity Type Selection -->
+<div class="input-group">
+    <label>
+        <i class="fas fa-plug icon"></i>
+        Electricity Source
+        <span class="tooltip">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltiptext">Select your primary electricity source</span>
+        </span>
+    </label>
+    <select id="electricityTypePersonal" class="meal-type-select">
+        <option value="zesco">ZESCO (Grid Power)</option>
+        <option value="solar">Solar</option>
+        <option value="generator">Generator</option>
+        <option value="hybrid">Hybrid (Grid + Solar)</option>
+    </select>
+</div>
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-utensils icon"></i>
+                    Number of Meals per Day
+                    <span class="tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Counts meals with significant carbon footprint (meat/dairy heavy)</span>
+                    </span>
+                </label>
+                <div class="meals-control">
+                    <button class="meals-btn" onclick="changeMeals(-1)">−</button>
+                    <input type="number" id="meals" value="3" min="1" max="10" readonly>
+                    <button class="meals-btn" onclick="changeMeals(1)">+</button>
+                </div>
+            </div>
+			<!--meals control -->
+			<div class="input-group">
+    			<label>
+        			<i class="fas fa-utensils icon"></i>
+        			Meal Type
+        			<span class="tooltip">
+            		<i class="fas fa-info-circle"></i>
+            			<span class="tooltiptext">Select the type of meals you typically eat</span>
+       				 </span>
+    			</label>
+   			 <select id="mealType" class="meal-type-select">
+        			<option value="beef" data-icon="🥩">🥩 Beef stew with nshima & vegetables</option>
+        			<option value="chicken" data-icon="🍗">🍗 Chicken with rice & greens</option>
+        			<option value="vegetarian" data-icon="🌱">🌱 Beans & vegetables with nshima/rice</option>
+    		</select>
+			</div>
+            <button class="calculate-btn" onclick="calculatePersonal()">
+                <i class="fas fa-calculator"></i>
+                Calculate Personal Emissions
+            </button>
+        </div>
+
+        <div id="construction" class="section">
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-cubes icon"></i>
+                    Embodied Carbon from Materials (kg CO₂e/month)
+                    <span class="tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Monthly carbon emissions from construction materials</span>
+                    </span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" class="slider" min="0" max="2000" value="670" step="10" oninput="updateSliderValue(this, 'embodiedCarbonValue')">
+                    <span class="slider-value" id="embodiedCarbonValue">670</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-bolt icon"></i>
+                    Electricity Used (kWh/month)
+                    <span class="tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Monthly electricity consumption for construction activities</span>
+                    </span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" class="slider" min="0" max="2000" value="780" step="10" oninput="updateSliderValue(this, 'constructionElectricityValue')">
+                    <span class="slider-value" id="constructionElectricityValue">780</span>
+                </div>
+            </div>
+			<!-- NEW: Electricity Type Selection for Construction -->
+<div class="input-group">
+    <label>
+        <i class="fas fa-plug icon"></i>
+        Electricity Source
+        <span class="tooltip">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltiptext">Select primary electricity source for construction</span>
+        </span>
+    </label>
+    <select id="electricityTypeConstruction" class="meal-type-select">
+        <option value="zesco">ZESCO (Grid Power)</option>
+        <option value="solar">Solar</option>
+        <option value="generator">Generator</option>
+        <option value="hybrid">Hybrid (Grid + Solar)</option>
+    </select>
+</div>
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-tractor icon"></i>
+                    Machinery Usage (hours/week)
+                    <span class="tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Weekly hours of machinery operation on site</span>
+                    </span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" class="slider" min="0" max="500" value="78" step="1" oninput="updateSliderValue(this, 'machineryValue')">
+                    <span class="slider-value" id="machineryValue">78</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-truck icon"></i>
+                    Transport Distance (km/week)
+                    <span class="tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Weekly distance traveled for material transport</span>
+                    </span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" class="slider" min="0" max="1000" value="78" step="5" oninput="updateSliderValue(this, 'constructionTransportValue')">
+                    <span class="slider-value" id="constructionTransportValue">78</span>
+                </div>
+            </div>
+            <button class="calculate-btn" onclick="calculateConstruction()">
+                <i class="fas fa-calculator"></i>
+                Calculate Construction Emissions
+            </button>
+        </div>
+
+        <div id="manufacturing" class="section">
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-cube icon"></i>
+                    Raw Material Usage (kg CO₂e/month)
+                    <span class="tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Monthly carbon emissions from raw materials</span>
+                    </span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" class="slider" min="0" max="2000" value="890" step="10" oninput="updateSliderValue(this, 'rawMaterialValue')">
+                    <span class="slider-value" id="rawMaterialValue">890</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-bolt icon"></i>
+                    Energy Consumption (kWh/month)
+                    <span class="tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Monthly energy used in manufacturing processes</span>
+                    </span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" class="slider" min="0" max="2000" value="890" step="10" oninput="updateSliderValue(this, 'manufacturingEnergyValue')">
+                    <span class="slider-value" id="manufacturingEnergyValue">890</span>
+                </div>
+            </div>
+			<!-- NEW: Electricity Type Selection for Manufacturing -->
+<div class="input-group">
+    <label>
+        <i class="fas fa-plug icon"></i>
+        Electricity Source
+        <span class="tooltip">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltiptext">Select primary electricity source for manufacturing</span>
+        </span>
+    </label>
+    <select id="electricityTypeManufacturing" class="meal-type-select">
+        <option value="zesco">ZESCO (Grid Power)</option>
+        <option value="solar">Solar</option>
+        <option value="generator">Generator</option>
+        <option value="hybrid">Hybrid (Grid + Solar)</option>
+    </select>
+</div>
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-tint icon"></i>
+                    Water Usage (cubic meters/month)
+                    <span class="tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Monthly water consumption in manufacturing</span>
+                    </span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" class="slider" min="0" max="2000" value="789" step="10" oninput="updateSliderValue(this, 'waterValue')">
+                    <span class="slider-value" id="waterValue">789</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-trash icon"></i>
+                    Waste Produced (kg/month)
+                    <span class="tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Monthly waste generated from manufacturing</span>
+                    </span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" class="slider" min="0" max="500" value="75" step="5" oninput="updateSliderValue(this, 'manufacturingWasteValue')">
+                    <span class="slider-value" id="manufacturingWasteValue">75</span>
+                </div>
+            </div>
+            <div class="input-group">
+                <label>
+                    <i class="fas fa-shipping-fast icon"></i>
+                    Transportation (km/month)
+                    <span class="tooltip">
+                        <i class="fas fa-info-circle"></i>
+                        <span class="tooltiptext">Monthly distance for product transportation</span>
+                    </span>
+                </label>
+                <div class="slider-container">
+                    <input type="range" class="slider" min="0" max="2000" value="789" step="10" oninput="updateSliderValue(this, 'manufacturingTransportValue')">
+                    <span class="slider-value" id="manufacturingTransportValue">789</span>
+                </div>
+            </div>
+            <button class="calculate-btn" onclick="calculateManufacturing()">
+                <i class="fas fa-calculator"></i>
+                Calculate Manufacturing Emissions
+            </button>
+        </div>
+
+		<!-- AGRICULTURE SECTION -->
+<div id="agriculture" class="section">
+    <div class="input-group">
+        <label>
+            <i class="fas fa-seedling icon"></i>
+            Land Use (hectares/month)
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Amount of land used for agriculture</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="500" value="50" step="1" oninput="updateSliderValue(this, 'agricultureLandValue')">
+            <span class="slider-value" id="agricultureLandValue">50</span>
+        </div>
+    </div>
+    <div class="input-group">
+        <label>
+            <i class="fas fa-flask icon"></i>
+            Fertilizer Usage (kg/month)
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Monthly fertilizer consumption</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="1000" value="100" step="10" oninput="updateSliderValue(this, 'fertilizerValue')">
+            <span class="slider-value" id="fertilizerValue">100</span>
+        </div>
+    </div>
+    <div class="input-group">
+        <label>
+            <i class="fas fa-hippo icon"></i>
+            Livestock Count (animals)
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Number of livestock raised</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="1000" value="20" step="1" oninput="updateSliderValue(this, 'livestockValue')">
+            <span class="slider-value" id="livestockValue">20</span>
+        </div>
+    </div>
+<div class="input-group">
+    <label>
+        <i class="fas fa-wind icon"></i>
+        Methane Capture Technology
+        <span class="tooltip">
+            <i class="fas fa-info-circle"></i>
+            <span class="tooltiptext">Check if methane capture technology is implemented (reduces livestock emissions)</span>
+        </span>
+    </label>
+    <div class="checkbox-container">
+        <label for="methaneCaptureCheckbox" class="checkbox-label">
+            <input type="checkbox" id="methaneCaptureCheckbox">
+        </label>
+    </div>
+</div>
+
+    <button class="calculate-btn" onclick="calculateAgriculture()">
+        <i class="fas fa-calculator"></i>
+        Calculate Agriculture Emissions
+    </button>
+</div>
+
+<!-- Add this after the Agriculture section -->
+<div id="openair" class="section">
+    <div class="input-group">
+        <label>
+            <i class="fas fa-trash icon"></i>
+            Type of Waste Burned
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Select the primary type of waste you burn</span>
+            </span>
+        </label>
+        <select id="wasteType" class="waste-type-select">
+            <option value="plastics">Plastics</option>
+            <option value="paper">Paper/Cardboard</option>
+            <option value="food">Food Waste</option>
+            <option value="garden">Garden Waste</option>
+            <option value="mixed">Mixed Waste</option>
+        </select>
+    </div>
+    <div class="input-group">
+        <label>
+            <i class="fas fa-calendar icon"></i>
+            Burning Frequency
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">How often do you burn waste?</span>
+            </span>
+        </label>
+        <select id="burnFrequency">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+        </select>
+    </div>
+    <div class="input-group">
+        <label>
+            <i class="fas fa-weight-hanging icon"></i>
+            Amount Burned per Session (kg)
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Estimated weight of waste burned each time</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="50" value="5" step="0.5" oninput="updateSliderValue(this, 'burnAmountValue')">
+            <span class="slider-value" id="burnAmountValue">5</span>
+        </div>
+    </div>
+    <button class="calculate-btn" onclick="calculateOpenAir()">
+        <i class="fas fa-calculator"></i>
+        Calculate Burning Emissions
+    </button>
+</div>
+
+<!-- Student section -->
+<div id="student" class="section">
+    <div class="input-group">
+        <label>
+            <i class="fas fa-school icon"></i>
+            School/University Name
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Enter your school or university name</span>
+            </span>
+        </label>
+        <input type="text" id="schoolName" placeholder="e.g., University of Zambia">
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-user-graduate icon"></i>
+            Grade/Year of Study
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Enter your grade level or year of study (optional)</span>
+            </span>
+        </label>
+        <input type="text" id="gradeLevel" placeholder="e.g., Grade 10 or Year 2">
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-bus icon"></i>
+            Transportation Type
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Select how you usually get to school</span>
+            </span>
+        </label>
+        <select id="studentTransportType" class="meal-type-select">
+            <option value="walking">🚶‍♂️ Walk</option>
+            <option value="bicycle">🚴‍♂️ Bicycle</option>
+            <option value="bus">🚌 School Bus</option>
+            <option value="carpool">👥 Carpool</option>
+            <option value="public">🚍 Public Transport</option>
+            <option value="car">🚗 Car (Personal)</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-route icon"></i>
+            Daily Commute Distance (km)
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Round-trip distance to school per day</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="50" value="5" step="0.5" oninput="updateSliderValue(this, 'studentCommuteValue')">
+            <span class="slider-value" id="studentCommuteValue">5</span>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-bolt icon"></i>
+            Daily Electricity Use (hours)
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Average daily hours of electricity use for studying and gadgets</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="12" value="3" step="0.5" oninput="updateSliderValue(this, 'studentElectricityValue')">
+            <span class="slider-value" id="studentElectricityValue">3</span>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-plug icon"></i>
+            Electricity Source
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Select your primary electricity source</span>
+            </span>
+        </label>
+        <select id="electricityTypeStudent" class="meal-type-select">
+            <option value="zesco">ZESCO (Grid Power)</option>
+            <option value="solar">Solar</option>
+            <option value="generator">Generator</option>
+            <option value="hybrid">Hybrid (Grid + Solar)</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-utensils icon"></i>
+            Meat-based Meals per Week
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Number of meals containing meat each week</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="21" value="7" step="1" oninput="updateSliderValue(this, 'studentMealsValue')">
+            <span class="slider-value" id="studentMealsValue">7</span>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-recycle icon"></i>
+            Recycling Habit
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">How often do you recycle?</span>
+            </span>
+        </label>
+        <select id="studentRecycling" class="meal-type-select">
+            <option value="none">Never</option>
+            <option value="sometimes">Sometimes</option>
+            <option value="often">Often</option>
+            <option value="always">Always</option>
+        </select>
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-trash icon"></i>
+            Weekly Waste Items
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Approximate number of plastic bottles, wrappers, etc. disposed per week</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="50" value="10" step="1" oninput="updateSliderValue(this, 'studentWasteValue')">
+            <span class="slider-value" id="studentWasteValue">10</span>
+        </div>
+    </div>
+
+    <div class="input-group">
+        <label>
+            <i class="fas fa-laptop icon"></i>
+            Daily Digital Usage (hours)
+            <span class="tooltip">
+                <i class="fas fa-info-circle"></i>
+                <span class="tooltiptext">Daily hours spent on gaming, streaming, social media</span>
+            </span>
+        </label>
+        <div class="slider-container">
+            <input type="range" class="slider" min="0" max="10" value="2" step="0.5" oninput="updateSliderValue(this, 'studentDigitalValue')">
+            <span class="slider-value" id="studentDigitalValue">2</span>
+        </div>
+    </div>
+
+    <button class="calculate-btn" onclick="calculateStudent()">
+        <i class="fas fa-calculator"></i>
+        Calculate Student Emissions
+    </button>
+</div>
+
+        <div id="results" class="section">
+            <div class="results-header">
+                <h2>Emissions Summary</h2>
+            </div>
+
+            <div class="emissions-summary">
+                <div class="emissions-category">
+                    <div class="category-name">Materials</div>
+                    <div class="category-value" id="materialsValue">67.0 kg CO₂e/month</div>
+                    <div class="category-percentage" id="materialsPercentage">20.1% of total</div>
+                </div>
+                <div class="emissions-category">
+                    <div class="category-name">Machinery</div>
+                    <div class="category-value" id="machineryValue">210.6 kg CO₂e/month</div>
+                    <div class="category-percentage" id="machineryPercentage">63.2% of total</div>
+                </div>
+                <div class="emissions-category">
+                    <div class="category-name">Electricity</div>
+                    <div class="category-value" id="electricityValue">39.0 kg CO₂e/month</div>
+                    <div class="category-percentage" id="electricityPercentage">11.7% of total</div>
+                </div>
+                <div class="emissions-category">
+                    <div class="category-name">Transport</div>
+                    <div class="category-value" id="transportValue">16.4 kg CO₂e/month</div>
+                    <div class="category-percentage" id="transportPercentage">4.9% of total</div>
+                </div>
+            </div>
+
+            <div class="total-emissions" id="totalEmissions">Total Emissions: 333.0 kg CO₂e/month</div>
+            <div class="daily-average" id="dailyAverage">Daily Average: 10.9 kg CO₂e/day</div>
+
+		<!-- PDF button -->
+		<button class="calculate-btn" onclick="exportToPDF()">
+    		<i class="fas fa-file-pdf"></i> Export Summary as PDF
+		</button>
+
+		<!-- Back to Dashboard button -->
+		<button onclick="goToDashboard()" class="calculate-btn">
+    		<i class="fas fa-home"></i> Go to Dashboard
+		</button>
+ 			
+		<!-- Back button -->
+    		<button onclick="window.location.href='index.html'" class="calculate-btn">
+        		<i class="fas fa-arrow-left"></i> Back to Calculator</button>
+        </div>
+
+		<!-- ESG button -->
+<button class="esg-btn" aria-label="Schedule ESG consultancy Appointment" id="esgBtn">
+  <i class="fas fa-calendar" aria-hidden="true"></i>
+  <span>Make an appointment with ESG expert</span>
+</button>
+    </div>
+
+<script>
+	// Firebase configuration
+        const firebaseConfig = {
+                apiKey: "AIzaSyCCNhqRfWuHoRmaBUsGNYY_kDjygsIkUMQ",
+                authDomain: "climateyanga.firebaseapp.com",
+                projectId: "climateyanga",
+                storageBucket: "climateyanga.firebasestorage.app",
+                messagingSenderId: "1061123944259",
+                appId: "1:1061123944259:web:d20f0d45c7ff925185c9f6"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+    // Check auth status
+    auth.onAuthStateChanged((user) => {
+        const userStatus = document.getElementById('userStatus');
+        const authButton = document.getElementById('authButton');
+        
+        if (user) {
+            userStatus.textContent = `Logged in as ${user.email}`;
+            authButton.textContent = 'Logout';
+            authButton.onclick = () => auth.signOut();
+        } else {
+            userStatus.textContent = 'Not logged in';
+            authButton.textContent = 'Login';
+            authButton.onclick = () => window.location.href = 'login.html';
+        }
+    });
+    
+    function goToDashboard() {
+        if (auth.currentUser) {
+            window.location.href = 'dashboard.html';
+        } else {
+            if (confirm('You need to be logged in to access the dashboard. Would you like to login now?')) {
+                window.location.href = 'login.html';
+            }
+        }
+    }
+</script>
+
+    <!-- Sidebar for Offset Options -->
+    <div class="sidebar">
+        <h2><i class="fas fa-seedling"></i> Offset Your Carbon Footprint</h2>
+        <div class="offset-option">
+            <h3><i class="fas fa-tree"></i> Plant Trees</h3>
+            <p>Support local reforestation projects. One tree offsets approximately 25kg of CO2 annually.</p>
+            <a href="https://www.facebook.com/share/p/16fVrQh3vP/" class="offset-btn">Plant Now</a>
+        </div>
+        <div class="offset-option">
+            <h3><i class="fas fa-recycle"></i> Eco Waste Management</h3>
+            <p>Fund innovative recycling programs and waste reduction initiatives.</p>
+            <a href="https://www.facebook.com/share/p/19ZKjJYUWH/" class="offset-btn">Support</a>
+        </div>
+        <div class="offset-option">
+            <h3><i class="fas fa-building"></i> Green Building Projects</h3>
+            <p>Support sustainable building practices and renewable energy infrastructure.</p>
+            <a href="https://www.facebook.com/share/v/16ZgiYnazm/" class="offset-btn">Support</a>
+        </div>
+
+    </div>
+</div>
+
+<!-- Partners Section -->
+<div class="partners-section">
+    <h2>Our Partners</h2>
+    <div class="partners-scroll">
+        <div class="partners-scroll-inner">
+            <div class="partner">
+                <img src="images/Kmobile.png" alt="KMobile Hub">
+                <p>KMobile Hub</p>
+            </div>
+            <div class="partner">
+                <img src="images/bwana.jpeg" alt="KMobile Hub">
+                <p>Bwana Lifestyle</p>
+            </div>
+	    <div class="partner">
+                <img src="images/musika.jpeg" alt="KMobile Hub">
+                <p>Musika</p>
+            </div>
+
+            <!-- Duplicate partners to create infinite scroll effect -->
+
+        </div>
+    </div>
+</div>
+
+
+<!-- Add this right before the closing </body> tag -->
+<footer class="site-footer">
+  <div class="footer-content">
+    <div class="social-buttons" aria-hidden="false">
+      <a href="https://www.facebook.com/share/p/1EhnQWLuTE/" target="_blank" class="facebook-btn" aria-label="Follow us on Facebook">
+        <i class="fab fa-facebook-f" aria-hidden="true"></i>
+        <span>Follow Us</span>
+      </a>
+
+      <a href="mailto:info@climateyanga.com" class="gmail-btn" aria-label="Contact us by email">
+        <i class="fas fa-envelope" aria-hidden="true"></i>
+        <span>Contact Us</span>
+      </a>
+
+    </div>
+	  
+    <p class="footer-text">A climate awareness and action initiative by: <strong>Carbon Calculator Yanga Foundation, © 2025</strong></p>
+    <p class="footer-text"><a href="terms.html"><u>Terms of Use</u></a></p>
+  </div>
+</footer>
+
+
+
+<script src="app.js"></script>
+
+		<!-- ESG Modal -->
+<div id="esgModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2>Request ESG Consultancy Appointment</h2>
+    <form id="appointmentForm">
+      <div class="input-group">
+        <label>Full Name *</label>
+        <input type="text" id="fullName" required>
+      </div>
+      <div class="input-group">
+        <label>Email *</label>
+        <input type="email" id="email" required>
+      </div>
+      <div class="input-group">
+        <label>Phone Number *</label>
+        <input type="tel" id="phone" required>
+      </div>
+      <div class="input-group">
+        <label>Province *</label>
+        <select id="province" required>
+          <option value="">Select Province</option>
+          <option value="Lusaka">Lusaka</option>
+          <option value="Copperbelt">Copperbelt</option>
+          <option value="Central">Central</option>
+          <option value="Eastern">Eastern</option>
+          <option value="Luapula">Luapula</option>
+          <option value="Northern">Northern</option>
+          <option value="North-Western">North-Western</option>
+          <option value="Southern">Southern</option>
+          <option value="Western">Western</option>
+          <option value="Muchinga">Muchinga</option>
+        </select>
+      </div>
+      <button type="submit" class="calculate-btn">Request Appointment</button>
+    </form>
+  </div>
+</div>
+
+<!-- Snackbar -->
+<div id="snackbar">Appointment Requested Successfully</div>
+
+</body>
+</html>
